@@ -32,6 +32,9 @@ void setup()
 void loop()
 
 {
+   lcd.begin();//lcd ekranın boyutları icin
+      lcd.backlight();
+      lcd.print("KARTINIZI OKUTUNUZ");
   servo.write(0);  //servoyu 0 dereceye aldıyoruz her seferinde.
   izin = true;
 
@@ -58,3 +61,79 @@ void loop()
       Serial.println(" ");
 
     }
+
+
+    for (int i = 0; i < 5; i++) //dÃ¶ngÃ¼ yardimi ile kayitli kart ile karÅŸÄ±laÅŸtÄ±rma yapiliyor.
+    {
+      if (rfid.serNum[i] != kart[i])  // ayni kart değilse izin değiskeni FALSE.
+      {
+        izin = false;
+      }
+    }
+    if (izin == true)  //ayni kart ise izin değiskeni TRUE. TRUE ise asağidaki islemler.
+    {
+     
+      lcd.setCursor(0,0);//lcd ekrana yazı yazmak icin imlecin yerini belirler
+      lcd.clear();
+      lcd.print("KART OKUNDU");
+      lcd.setCursor(0,1);
+      lcd.print("IZIN VERILDI");
+      Serial.println("IZIN VERILDI");
+      digitalWrite(kled, LOW);
+      digitalWrite(buzzer, HIGH);
+      delay(50);
+      digitalWrite(buzzer, LOW);
+      delay(50);
+      digitalWrite(buzzer, HIGH);
+      delay(50);
+      digitalWrite(buzzer, LOW);
+      digitalWrite(yled, HIGH);
+      servo.write(90);
+      delay(5000);
+      lcd.clear();
+      lcd.print("KAPI KAPANIYOR");
+      delay(1000);
+      lcd.clear();
+      lcd.print("KARTINIZI OKUTUNUZ");
+
+    }
+
+
+
+    else    // FALSE ise asağidaki islemler.
+    {
+      lcd.begin();
+      lcd.backlight();
+      lcd.setCursor(0,0);
+      lcd.clear();
+      lcd.print("KAPI ACILMADI");
+      lcd.setCursor(0,1);
+      lcd.print("IZINSIZ GIRIS!!!!!!");
+      Serial.println("IZINSIZ GIRIS!!!!!!!");
+      digitalWrite(buzzer, HIGH);
+      delay(300);
+      digitalWrite(buzzer, LOW);
+      digitalWrite(buzzer, HIGH);
+      delay(50);
+      digitalWrite(buzzer, LOW);
+      digitalWrite(buzzer, HIGH);
+      delay(50);
+      digitalWrite(buzzer, LOW);
+      digitalWrite(kled, HIGH);
+      delay(500);
+      digitalWrite(yled, LOW);
+      servo.write(0);
+      delay(1000);
+      lcd.clear();
+      lcd.print("KARTINIZI OKUTUNUZ");
+
+    }
+
+
+
+    rfid.halt();  //RFID sonlandiriliyor.
+  }
+  else                              //diğer türlü yesil ve kirmizi LED ler silinsin.
+    digitalWrite(yled, LOW);
+    digitalWrite(kled, LOW);
+}
